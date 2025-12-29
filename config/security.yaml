@@ -1,0 +1,173 @@
+# 安全配置
+security:
+  # JWT配置
+  jwt:
+    secret: ${JWT_SECRET}
+    algorithm: "HS256"
+    expires_in: "7d"
+    refresh_secret: ${JWT_REFRESH_SECRET}
+    refresh_expires_in: "30d"
+    issuer: "securechat"
+    audience: "securechat_users"
+    
+    # Token黑名单
+    blacklist:
+      enabled: true
+      type: "redis"  # redis 或 database
+      ttl: 86400
+    
+    # 自动刷新
+    auto_refresh: true
+    refresh_threshold: 300  # 5分钟前刷新
+  
+  # 密码策略
+  password:
+    min_length: 12
+    require_uppercase: true
+    require_lowercase: true
+    require_numbers: true
+    require_symbols: true
+    max_age_days: 90
+    history_size: 5
+    bcrypt_rounds: 12
+    
+    # 常见密码黑名单
+    blacklist:
+      enabled: true
+      file: "/app/config/password_blacklist.txt"
+  
+  # 加密配置
+  encryption:
+    key: ${ENCRYPTION_KEY}
+    algorithm: ${ENCRYPTION_ALGORITHM:-aes-256-gcm}
+    iv_length: ${ENCRYPTION_IV_LENGTH:-16}
+    
+    # 消息加密
+    message:
+      enabled: true
+      algorithm: "aes-256-gcm"
+      key_rotation_days: 30
+    
+    # 文件加密
+    file:
+      enabled: true
+      algorithm: "aes-256-gcm"
+      chunk_size: 65536
+  
+  # 会话安全
+  session:
+    secret: ${SESSION_SECRET}
+    name: "securechat.sid"
+    max_age: ${SESSION_MAX_AGE:-86400000}
+    secure: ${SESSION_SECURE:-true}
+    http_only: ${SESSION_HTTP_ONLY:-true}
+    same_site: "strict"
+    rolling: false
+    renew: true
+    
+    # Redis会话存储
+    store:
+      type: "redis"
+      prefix: "session:"
+      ttl: 86400
+  
+  # 速率限制
+  rate_limit:
+    enabled: true
+    window_ms: ${RATE_LIMIT_WINDOW:-15}  # 分钟
+    max: ${RATE_LIMIT_MAX:-100}
+    
+    # 特定端点限制
+    endpoints:
+      login:
+        window_ms: 15
+        max: 5
+      register:
+        window_ms: 60
+        max: 3
+      messages:
+        window_ms: 1
+        max: 30
+    
+    # 白名单
+    whitelist:
+      - "127.0.0.1"
+      - "10.0.0.0/8"
+  
+  # CORS配置
+  cors:
+    enabled: true
+    origins:
+      - ${CORS_ORIGINS:-https://securechat.example.com}
+    methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "PATCH"
+      - "OPTIONS"
+    allowed_headers:
+      - "Content-Type"
+      - "Authorization"
+      - "X-Requested-With"
+      - "X-API-Key"
+    exposed_headers:
+      - "Content-Length"
+      - "X-Request-ID"
+    credentials: true
+    max_age: 86400
+  
+  # CSRF保护
+  csrf:
+    enabled: ${CSRF_ENABLED:-true}
+    cookie_name: "_csrf"
+    header_name: "X-CSRF-Token"
+    secret: "${CSRF_SECRET}"
+    max_age: 86400
+  
+  # 安全头
+  headers:
+    x_frame_options: "DENY"
+    x_content_type_options: "nosniff"
+    x_xss_protection: "1; mode=block"
+    referrer_policy: "strict-origin-when-cross-origin"
+    permissions_policy: "camera=(), microphone=(), geolocation=()"
+  
+  # 审计日志
+  audit:
+    enabled: true
+    log_file: "/app/logs/audit.log"
+    events:
+      - "login"
+      - "logout"
+      - "password_change"
+      - "permission_change"
+      - "file_upload"
+      - "message_send"
+    
+    # 敏感数据屏蔽
+    data_masking:
+      enabled: true
+      fields:
+        - "password"
+        - "token"
+        - "credit_card"
+        - "ssn"
+  
+  # 输入验证
+  validation:
+    max_string_length: 1000
+    max_array_length: 100
+    max_object_depth: 10
+    sanitize_html: true
+    
+    # SQL注入防护
+    sql_injection:
+      enabled: true
+      patterns_file: "/app/config/sql_injection_patterns.txt"
+    
+    # XSS防护
+    xss:
+      enabled: true
+      strip_tags: true
+      escape_html: true

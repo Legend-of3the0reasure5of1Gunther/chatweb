@@ -1,0 +1,100 @@
+# 缓存配置
+cache:
+  # Redis缓存
+  redis:
+    enabled: true
+    host: ${REDIS_HOST:-redis}
+    port: ${REDIS_PORT:-6379}
+    password: ${REDIS_PASSWORD}
+    db: ${REDIS_DB:-0}
+    key_prefix: "securechat:"
+    
+    # 连接池
+    pool:
+      min: 2
+      max: 10
+      acquire_timeout: 5000
+      idle_timeout: 10000
+    
+    # 序列化
+    serialization:
+      type: "msgpack"  # json, msgpack, or raw
+      compress: true
+      compress_threshold: 1024
+    
+    # 集群模式
+    cluster:
+      enabled: false
+      nodes:
+        - "redis://redis1:6379"
+        - "redis://redis2:6379"
+        - "redis://redis3:6379"
+  
+  # 内存缓存
+  memory:
+    enabled: true
+    max: 500
+    ttl: 300000  # 5分钟
+    update_age_on_get: true
+    
+    # 垃圾回收
+    gc:
+      enabled: true
+      interval: 3600000  # 1小时
+  
+  # 缓存策略
+  strategies:
+    # 用户数据缓存
+    user:
+      ttl: 300  # 5分钟
+      stale_while_revalidate: 60
+      cache_control: "public, max-age=300"
+      
+    # 聊天消息缓存
+    messages:
+      ttl: 60  # 1分钟
+      max_items: 1000
+      
+    # 文件元数据缓存
+    files:
+      ttl: 3600  # 1小时
+      
+    # 会话数据缓存
+    sessions:
+      ttl: 86400  # 24小时
+      storage: "redis"
+    
+    # 配置缓存
+    config:
+      ttl: 3600  # 1小时
+      watch_for_changes: true
+  
+  # 缓存失效
+  invalidation:
+    enabled: true
+    type: "pubsub"  # pubsub 或 broadcast
+    
+    # 自动失效规则
+    rules:
+      - pattern: "user:*"
+        on_events: ["user.update", "user.delete"]
+      
+      - pattern: "message:*"
+        on_events: ["message.create", "message.delete"]
+      
+      - pattern: "room:*"
+        on_events: ["room.update", "room.delete"]
+  
+  # 监控
+  monitoring:
+    enabled: true
+    metrics:
+      hit_rate: true
+      miss_rate: true
+      size: true
+      memory_usage: true
+    
+    # 警报
+    alerts:
+      hit_rate_threshold: 0.8
+      memory_threshold: 0.9

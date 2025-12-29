@@ -1,0 +1,217 @@
+<!-- 文件：web/index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全聊天系统</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/theme-dark.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- 登录界面 -->
+        <div id="login-screen" class="screen active">
+            <div class="login-box">
+                <h1>安全聊天系统</h1>
+                <form id="login-form">
+                    <input type="text" id="username" placeholder="用户名" required>
+                    <input type="password" id="password" placeholder="密码" required>
+                    <button type="submit">登录</button>
+                    <button type="button" id="register-btn">注册</button>
+                </form>
+                <div id="login-error" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- 主聊天界面 -->
+        <div id="chat-screen" class="screen">
+            <div class="sidebar">
+                <div class="user-header">
+                    <img id="user-avatar" src="images/default-avatar.png" alt="头像">
+                    <div class="user-info">
+                        <span id="user-name">用户名</span>
+                        <span id="user-status" class="status-online">在线</span>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="搜索用户或群组">
+                </div>
+                <div class="contact-list">
+                    <div class="list-header">
+                        <button id="recent-tab" class="tab-btn active">最近聊天</button>
+                        <button id="contacts-tab" class="tab-btn">联系人</button>
+                        <button id="groups-tab" class="tab-btn">群组</button>
+                    </div>
+                    <div id="recent-list" class="contact-list-content"></div>
+                    <div id="contacts-list" class="contact-list-content hidden"></div>
+                    <div id="groups-list" class="contact-list-content hidden"></div>
+                </div>
+            </div>
+            <div class="chat-main">
+                <div class="chat-header">
+                    <div class="chat-partner-info">
+                        <img id="partner-avatar" src="images/default-avatar.png" alt="头像">
+                        <div>
+                            <h3 id="partner-name">聊天对象</h3>
+                            <span id="partner-status" class="status-online">在线</span>
+                        </div>
+                    </div>
+                    <div class="chat-actions">
+                        <button id="video-call-btn" class="icon-btn">📹</button>
+                        <button id="audio-call-btn" class="icon-btn">🎤</button>
+                        <button id="file-send-btn" class="icon-btn">📎</button>
+                        <button id="chat-settings-btn" class="icon-btn">⚙️</button>
+                    </div>
+                </div>
+                <div class="chat-messages" id="message-container">
+                    <!-- 消息将在这里动态添加 -->
+                </div>
+                <div class="chat-input-area">
+                    <div class="input-tools">
+                        <button id="emoji-btn" class="tool-btn">😀</button>
+                        <button id="image-btn" class="tool-btn">🖼️</button>
+                        <button id="file-btn" class="tool-btn">📁</button>
+                        <button id="voice-btn" class="tool-btn">🎤</button>
+                    </div>
+                    <div class="message-input-wrapper">
+                        <textarea id="message-input" placeholder="输入消息..." rows="3"></textarea>
+                        <button id="send-btn">发送</button>
+                    </div>
+                </div>
+            </div>
+            <div class="right-sidebar">
+                <div class="file-transfer-panel">
+                    <h4>文件传输</h4>
+                    <div id="transfer-list"></div>
+                </div>
+                <div class="group-management-panel">
+                    <h4>群组管理</h4>
+                    <button id="create-group-btn">新建群组</button>
+                    <div id="group-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebAssembly 加载器 -->
+    <script type="module">
+        import { ChatClient } from './js/chat-client.js';
+        import { UIEngine } from './js/ui-engine.js';
+        import { SecurityManager } from './js/security.js';
+        
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', async () => {
+            const app = new ChatApp();
+            await app.init();
+        });
+        
+        class ChatApp {
+            constructor() {
+                this.client = null;
+                this.ui = null;
+                this.security = null;
+            }
+            
+            async init() {
+                try {
+                    // 初始化安全模块
+                    this.security = new SecurityManager();
+                    
+                    // 初始化UI引擎
+                    this.ui = new UIEngine();
+                    await this.ui.init();
+                    
+                    // 初始化聊天客户端
+                    this.client = new ChatClient(this.ui, this.security);
+                    await this.client.init();
+                    
+                    // 设置事件监听
+                    this.setupEventListeners();
+                    
+                    // 检查本地存储的登录信息
+                    await this.autoLogin();
+                    
+                } catch (error) {
+                    console.error('应用初始化失败:', error);
+                    this.ui.showError('应用初始化失败', error.message);
+                }
+            }
+            
+            async autoLogin() {
+                const savedToken = localStorage.getItem('auth_token');
+                if (savedToken) {
+                    try {
+                        await this.client.loginWithToken(savedToken);
+                    } catch (error) {
+                        localStorage.removeItem('auth_token');
+                    }
+                }
+            }
+            
+            setupEventListeners() {
+                // 登录表单提交
+                document.getElementById('login-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await this.handleLogin();
+                });
+                
+                // 消息发送
+                document.getElementById('send-btn').addEventListener('click', async () => {
+                    await this.handleSendMessage();
+                });
+                
+                // 文件发送
+                document.getElementById('file-btn').addEventListener('click', async () => {
+                    await this.handleFileSelect();
+                });
+            }
+            
+            async handleLogin() {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                try {
+                    await this.client.login(username, password);
+                    // 登录成功，切换到聊天界面
+                    this.ui.switchToChatScreen();
+                } catch (error) {
+                    this.ui.showLoginError(error.message);
+                }
+            }
+            
+            async handleSendMessage() {
+                const message = document.getElementById('message-input').value;
+                if (message.trim()) {
+                    try {
+                        await this.client.sendMessage(message);
+                        document.getElementById('message-input').value = '';
+                    } catch (error) {
+                        this.ui.showError('发送失败', error.message);
+                    }
+                }
+            }
+            
+            async handleFileSelect() {
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.multiple = false;
+                
+                fileInput.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        try {
+                            await this.client.sendFile(file);
+                        } catch (error) {
+                            this.ui.showError('文件发送失败', error.message);
+                        }
+                    }
+                });
+                
+                fileInput.click();
+            }
+        }
+    </script>
+</body>
+</html>

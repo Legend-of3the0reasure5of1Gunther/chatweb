@@ -1,0 +1,181 @@
+<!-- secure-chat-web/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Chat - Web Interface</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 登录界面 -->
+        <div id="login-screen" class="screen active">
+            <div class="login-container">
+                <div class="logo">
+                    <i class="fas fa-lock"></i>
+                    <h1>Secure Chat</h1>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <input type="text" id="username" placeholder="Username" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="button" id="register-btn" class="btn btn-secondary">Register</button>
+                </form>
+                <div class="connection-status">
+                    <span id="connection-indicator" class="status-offline"></span>
+                    <span id="connection-text">Disconnected</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 注册界面 -->
+        <div id="register-screen" class="screen">
+            <div class="register-container">
+                <h2>Create Account</h2>
+                <form id="register-form">
+                    <div class="form-group">
+                        <input type="text" id="reg-username" placeholder="Username" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="reg-email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="reg-password" placeholder="Password" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="reg-confirm-password" placeholder="Confirm Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                    <button type="button" id="back-to-login" class="btn btn-secondary">Back to Login</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 主聊天界面 -->
+        <div id="chat-screen" class="screen">
+            <div class="chat-container">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="user-profile">
+                        <img id="user-avatar" src="assets/default-avatar.png" alt="Avatar">
+                        <div class="user-info">
+                            <span id="display-name">Loading...</span>
+                            <span id="user-status" class="status-online">Online</span>
+                        </div>
+                    </div>
+                    
+                    <div class="search-box">
+                        <input type="text" placeholder="Search users..." id="search-input">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    
+                    <div class="contacts-list">
+                        <div class="list-header">
+                            <span>Contacts</span>
+                            <button id="add-contact" class="btn-icon"><i class="fas fa-user-plus"></i></button>
+                        </div>
+                        <ul id="contacts"></ul>
+                    </div>
+                    
+                    <div class="groups-list">
+                        <div class="list-header">
+                            <span>Groups</span>
+                            <button id="create-group" class="btn-icon"><i class="fas fa-users"></i></button>
+                        </div>
+                        <ul id="groups"></ul>
+                    </div>
+                </div>
+
+                <!-- 主聊天区 -->
+                <div class="main-content">
+                    <!-- 聊天头 -->
+                    <div class="chat-header">
+                        <div class="chat-partner-info">
+                            <img id="partner-avatar" src="assets/default-avatar.png" alt="Avatar">
+                            <div>
+                                <span id="partner-name">Select a contact</span>
+                                <span id="partner-status" class="status-offline">Offline</span>
+                            </div>
+                        </div>
+                        <div class="chat-actions">
+                            <button id="video-call" class="btn-icon" disabled><i class="fas fa-video"></i></button>
+                            <button id="voice-call" class="btn-icon" disabled><i class="fas fa-phone"></i></button>
+                            <button id="file-transfer" class="btn-icon" disabled><i class="fas fa-paperclip"></i></button>
+                            <button id="chat-settings" class="btn-icon"><i class="fas fa-cog"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- 消息区域 -->
+                    <div class="messages-container" id="messages-container">
+                        <div class="messages" id="messages">
+                            <!-- 消息会动态添加到这里 -->
+                        </div>
+                    </div>
+
+                    <!-- 消息输入区 -->
+                    <div class="message-input">
+                        <div class="input-tools">
+                            <button id="emoji-btn" class="btn-icon"><i class="far fa-smile"></i></button>
+                            <button id="attach-btn" class="btn-icon"><i class="fas fa-paperclip"></i></button>
+                            <button id="encrypt-btn" class="btn-icon active"><i class="fas fa-lock"></i></button>
+                        </div>
+                        <textarea id="message-input" placeholder="Type your message... (Enter to send, Shift+Enter for new line)" rows="1"></textarea>
+                        <button id="send-btn" class="btn-primary" disabled><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+
+                <!-- 文件传输侧边栏 -->
+                <div class="file-sidebar" id="file-sidebar">
+                    <div class="sidebar-header">
+                        <span>File Transfers</span>
+                        <button id="close-files" class="btn-icon"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="file-transfers" id="file-transfers">
+                        <!-- 文件传输进度会显示在这里 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框 -->
+        <div id="modal-overlay" class="modal-overlay">
+            <div class="modal" id="file-transfer-modal">
+                <div class="modal-header">
+                    <h3>Send File</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-content">
+                    <input type="file" id="file-selector" multiple>
+                    <div class="file-list" id="file-list"></div>
+                    <div class="transfer-options">
+                        <label>
+                            <input type="checkbox" id="encrypt-file" checked>
+                            Encrypt File
+                        </label>
+                        <label>
+                            <input type="checkbox" id="compress-file">
+                            Compress File
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="start-transfer" class="btn-primary">Start Transfer</button>
+                    <button class="btn-secondary close-modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/websocket-client.js"></script>
+    <script src="js/ui-manager.js"></script>
+    <script src="js/file-transfer.js"></script>
+    <script src="js/encryption.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

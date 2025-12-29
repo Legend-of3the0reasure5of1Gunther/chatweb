@@ -1,0 +1,17 @@
+# 查看配置
+securechat-client --config ~/.securechat/config.json --validate
+
+# 导出配置
+securechat-client --config-export config-backup.json
+
+# 导入配置
+securechat-client --config-import config-backup.json --overwrite
+
+# 列出profiles
+securechat-client --list-profiles
+
+# 切换profile
+securechat-client --profile work
+
+# 迁移旧配置
+securechat-client --migrate-config ~/.oldchat/config.json ~/.securechat/config.json

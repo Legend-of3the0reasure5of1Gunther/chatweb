@@ -1,0 +1,248 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://securechat.example.com/schemas/client-config-schema.json",
+  "title": "SecureChat Client Configuration",
+  "description": "Schema for SecureChat client configuration files",
+  "type": "object",
+  
+  "definitions": {
+    "server_config": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "format": "hostname",
+          "description": "Server hostname or IP address"
+        },
+        "tcp_port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "default": 8888,
+          "description": "TCP port for connection"
+        },
+        "websocket_port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "default": 8889,
+          "description": "WebSocket port for real-time communication"
+        },
+        "api_base_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Base URL for REST API"
+        },
+        "enable_ssl": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable SSL/TLS encryption"
+        },
+        "ssl_verify_peer": {
+          "type": "boolean",
+          "default": true,
+          "description": "Verify server SSL certificate"
+        },
+        "ssl_ca_file": {
+          "type": "string",
+          "description": "Path to CA certificate file"
+        },
+        "connection_timeout": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 60000,
+          "default": 10000,
+          "description": "Connection timeout in milliseconds"
+        }
+      },
+      "required": ["host"],
+      "additionalProperties": false
+    },
+    
+    "authentication_config": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 64,
+          "description": "Username for authentication"
+        },
+        "password": {
+          "type": "string",
+          "description": "Password (will be encrypted when saved)"
+        },
+        "auto_login": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically login on startup"
+        },
+        "save_password": {
+          "type": "boolean",
+          "default": false,
+          "description": "Save password (encrypted)"
+        },
+        "session_token": {
+          "type": "string",
+          "description": "Session authentication token"
+        }
+      },
+      "additionalProperties": false
+    },
+    
+    "contact": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Unique user identifier"
+        },
+        "username": {
+          "type": "string",
+          "description": "Contact username"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Display name for contact"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Contact email address"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "Path to avatar image"
+        },
+        "is_favorite": {
+          "type": "boolean",
+          "default": false,
+          "description": "Mark as favorite contact"
+        }
+      },
+      "required": ["user_id", "username"],
+      "additionalProperties": false
+    }
+  },
+  
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "JSON Schema URI"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration file version"
+    },
+    "description": {
+      "type": "string",
+      "description": "Configuration description"
+    },
+    
+    "client": {
+      "type": "object",
+      "properties": {
+        "server": { "$ref": "#/definitions/server_config" },
+        "authentication": { "$ref": "#/definitions/authentication_config" },
+        "encryption": { "type": "object" },
+        "network": { "type": "object" },
+        "storage": { "type": "object" },
+        "user_interface": { "type": "object" },
+        "file_transfer": { "type": "object" },
+        "privacy": { "type": "object" },
+        "notifications": { "type": "object" },
+        "audio_video": { "type": "object" },
+        "advanced": { "type": "object" }
+      },
+      "required": ["server"],
+      "additionalProperties": false
+    },
+    
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Profile name"
+          },
+          "server": { "$ref": "#/definitions/server_config" },
+          "authentication": { "$ref": "#/definitions/authentication_config" },
+          "user_interface": { "type": "object" }
+        },
+        "required": ["name"],
+        "additionalProperties": false
+      }
+    },
+    
+    "contacts": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/contact" }
+    },
+    
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "group_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Unique group identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Group name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Group description"
+          },
+          "members": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "description": "List of member user IDs"
+          }
+        },
+        "required": ["group_id", "name"],
+        "additionalProperties": false
+      }
+    },
+    
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        },
+        "created_by": {
+          "type": "string",
+          "description": "Application that created the config"
+        },
+        "last_used_profile": {
+          "type": "string",
+          "description": "Last used profile name"
+        },
+        "configuration_version": {
+          "type": "integer",
+          "description": "Internal configuration version"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  
+  "required": ["version", "client"],
+  "additionalProperties": false
+}

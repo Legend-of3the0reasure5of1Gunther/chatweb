@@ -1,0 +1,90 @@
+# WebSocket服务器配置
+websocket:
+  enabled: ${WS_ENABLED:-true}
+  
+  # 服务器配置
+  server:
+    host: "0.0.0.0"
+    port: ${WS_PORT:-8081}
+    path: ${WS_PATH:-/ws}
+    max_connections: ${WS_MAX_CONNECTIONS:-1000}
+    
+    # SSL配置
+    ssl:
+      enabled: ${SSL_ENABLED:-true}
+      cert: ${SSL_CERT_PATH}
+      key: ${SSL_KEY_PATH}
+    
+    # 性能配置
+    performance:
+      max_payload_length: 16777216  # 16MB
+      compression:
+        enabled: true
+        threshold: 1024
+      ping_interval: ${WS_HEARTBEAT_INTERVAL:-30}
+      ping_timeout: 10
+    
+    # 连接管理
+    connection:
+      idle_timeout: 300
+      close_timeout: 10
+      max_backpressure: 1048576  # 1MB
+  
+  # 消息处理
+  messages:
+    max_size: 65536  # 64KB
+    queue_size: 1000
+    workers: 4
+    
+    # 序列化
+    serialization:
+      type: "json"  # json 或 msgpack
+      compress: true
+      compress_threshold: 1024
+    
+    # 验证
+    validation:
+      enabled: true
+      schema_path: "/app/config/websocket_schemas"
+  
+  # 房间/频道管理
+  rooms:
+    enabled: true
+    max_rooms_per_connection: 10
+    max_members_per_room: 100
+    cleanup_interval: 3600
+    
+    # 持久化
+    persistence:
+      enabled: true
+      type: "redis"
+      prefix: "room:"
+      ttl: 86400
+  
+  # 事件处理
+  events:
+    on_connect: "websocket_server.on_connect"
+    on_message: "websocket_server.on_message"
+    on_close: "websocket_server.on_close"
+    on_error: "websocket_server.on_error"
+    
+    # 自定义事件
+    custom:
+      - "chat_message"
+      - "typing"
+      - "presence"
+      - "file_transfer"
+  
+  # 监控
+  monitoring:
+    enabled: true
+    metrics:
+      connections: true
+      messages: true
+      errors: true
+    dashboard_path: "/websocket-monitor"
+    
+    # 警报
+    alerts:
+      max_connections_threshold: 800
+      error_rate_threshold: 0.01

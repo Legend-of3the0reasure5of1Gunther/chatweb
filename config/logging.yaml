@@ -1,0 +1,85 @@
+# 日志配置
+logging:
+  # 主配置
+  level: ${LOG_LEVEL:-info}
+  format: ${LOG_FORMAT:-json}
+  timestamp: true
+  colorize: false
+  
+  # 输出目标
+  outputs:
+    - type: "file"
+      enabled: true
+      path: ${LOG_FILE_PATH:-/app/logs/securechat.log}
+      max_size: ${LOG_MAX_SIZE:-10485760}
+      max_files: ${LOG_MAX_FILES:-10}
+      compress: true
+      
+    - type: "console"
+      enabled: true
+      colorize: ${NODE_ENV:-development} == "development"
+      
+    - type: "syslog"
+      enabled: ${NODE_ENV:-production} == "production"
+      facility: "local0"
+      tag: "securechat"
+  
+  # 日志轮转
+  rotation:
+    enabled: true
+    pattern: "YYYY-MM-DD"
+    max_files: 30
+    compress: true
+    date_format: "YYYY-MM-DD_HH"
+  
+  # 结构化日志字段
+  fields:
+    service: "securechat"
+    version: "${APP_VERSION}"
+    environment: "${NODE_ENV}"
+    request_id: true
+    user_id: true
+    session_id: true
+  
+  # 不同组件的日志级别
+  components:
+    database: "warn"
+    websocket: "info"
+    security: "warn"
+    file_transfer: "info"
+    monitoring: "info"
+    cache: "warn"
+    
+    # HTTP请求日志
+    http:
+      enabled: true
+      level: "info"
+      format: "combined"
+      skip_paths:
+        - "/health"
+        - "/metrics"
+        - "/favicon.ico"
+  
+  # 日志采样（高流量时）
+  sampling:
+    enabled: true
+    rate: 0.1  # 10%的日志
+    level: "debug"
+  
+  # 错误日志
+  errors:
+    stack_trace: true
+    exit_on_error: false
+    unhandled_rejections: "log"
+    uncaught_exceptions: "log"
+  
+  # 审计日志
+  audit:
+    enabled: true
+    path: "/app/logs/audit.log"
+    format: "json"
+    events:
+      - "authentication"
+      - "authorization"
+      - "data_access"
+      - "configuration_change"

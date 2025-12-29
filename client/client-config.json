@@ -1,0 +1,371 @@
+{
+  "$schema": "./client-config-schema.json",
+  "version": "3.0.0",
+  "description": "SecureChat客户端配置文件",
+  
+  "client": {
+    "server": {
+      "host": "chat.example.com",
+      "tcp_port": 8888,
+      "websocket_port": 8889,
+      "api_base_url": "https://chat.example.com/api/v3",
+      "enable_ssl": true,
+      "ssl_verify_peer": true,
+      "ssl_ca_file": "/etc/ssl/certs/ca-certificates.crt",
+      "connection_timeout": 10000,
+      "keepalive_interval": 30000,
+      "keepalive_timeout": 120000,
+      "auto_reconnect": true,
+      "max_reconnect_attempts": 5,
+      "reconnect_delay": 5000,
+      "reconnect_backoff_multiplier": 2.0,
+      "max_reconnect_delay": 60000,
+      "use_compression": true,
+      "compression_level": 6,
+      "protocol_version": "3.0.0"
+    },
+    
+    "authentication": {
+      "username": "",
+      "password": "",
+      "auto_login": false,
+      "save_password": false,
+      "session_token": "",
+      "token_refresh_interval": 3600000,
+      "two_factor_enabled": false,
+      "two_factor_type": "totp",
+      "login_retry_attempts": 3,
+      "login_retry_delay": 1000,
+      "enable_remember_me": true,
+      "remember_me_duration": 2592000000
+    },
+    
+    "encryption": {
+      "enable_end_to_end_encryption": true,
+      "key_exchange_algorithm": "ECDH",
+      "symmetric_algorithm": "AES-256-GCM",
+      "key_size": 256,
+      "key_derivation_iterations": 100000,
+      "key_rotation_interval": 604800000,
+      "enable_perfect_forward_secrecy": true,
+      "enable_message_signing": true,
+      "signature_algorithm": "Ed25519",
+      "public_key": "",
+      "private_key": "",
+      "key_storage_method": "local_encrypted",
+      "key_encryption_password": ""
+    },
+    
+    "network": {
+      "use_proxy": false,
+      "proxy_type": "socks5",
+      "proxy_host": "proxy.example.com",
+      "proxy_port": 1080,
+      "proxy_username": "",
+      "proxy_password": "",
+      "proxy_dns": true,
+      "dns_servers": ["8.8.8.8", "1.1.1.1"],
+      "dns_timeout": 5000,
+      "enable_ipv6": true,
+      "bind_address": "0.0.0.0",
+      "bind_port": 0,
+      "mtu": 1500,
+      "tcp_nodelay": true,
+      "tcp_keepalive": true,
+      "tcp_keepidle": 60,
+      "tcp_keepintvl": 10,
+      "tcp_keepcnt": 5,
+      "buffer_size": 65536,
+      "send_buffer_size": 65536,
+      "recv_buffer_size": 65536
+    },
+    
+    "storage": {
+      "data_directory": "~/.securechat",
+      "cache_directory": "~/.securechat/cache",
+      "download_directory": "~/Downloads/SecureChat",
+      "temp_directory": "/tmp/securechat",
+      "max_cache_size": 1073741824,
+      "cache_cleanup_interval": 3600000,
+      "max_message_history": 10000,
+      "message_retention_days": 365,
+      "enable_message_backup": true,
+      "backup_interval": 86400000,
+      "backup_count": 7,
+      "database_type": "sqlite",
+      "database_path": "~/.securechat/securechat.db",
+      "encrypt_local_database": true,
+      "database_key": ""
+    },
+    
+    "user_interface": {
+      "theme": "dark",
+      "language": "zh_CN",
+      "font_family": "Noto Sans SC, sans-serif",
+      "font_size": 14,
+      "enable_animations": true,
+      "animation_duration": 300,
+      "show_timestamps": true,
+      "timestamp_format": "HH:mm:ss",
+      "date_format": "yyyy-MM-dd",
+      "show_message_delivery_status": true,
+      "show_typing_indicator": true,
+      "show_read_receipts": true,
+      "group_messages_by_sender": true,
+      "compact_mode": false,
+      "enable_emoji": true,
+      "emoji_style": "native",
+      "enable_spell_check": true,
+      "spell_check_language": "en_US,zh_CN",
+      "enter_to_send": true,
+      "enable_notifications": true,
+      "notification_sound": true,
+      "notification_sound_file": "notification.wav",
+      "notification_duration": 5000,
+      "show_notification_preview": true,
+      "notification_position": "top-right"
+    },
+    
+    "file_transfer": {
+      "enable_file_transfers": true,
+      "max_file_size": 104857600,
+      "max_concurrent_transfers": 3,
+      "chunk_size": 16384,
+      "enable_resume": true,
+      "resume_timeout": 3600000,
+      "auto_accept_files": false,
+      "auto_accept_from_contacts": true,
+      "auto_save_location": "",
+      "scan_for_viruses": true,
+      "virus_scan_command": "clamscan --no-summary",
+      "allowed_file_types": ["*"],
+      "blocked_file_types": [".exe", ".bat", ".cmd", ".sh", ".jar"],
+      "compress_before_send": true,
+      "compression_threshold": 1048576,
+      "encrypt_files": true,
+      "delete_temp_files": true,
+      "temp_file_expiry": 3600000
+    },
+    
+    "privacy": {
+      "online_status": "online",
+      "show_last_seen": true,
+      "show_typing_status": true,
+      "show_read_receipts": true,
+      "allow_screenshots": false,
+      "clear_history_on_exit": false,
+      "delete_old_messages": false,
+      "old_message_threshold": 2592000000,
+      "encrypt_message_database": true,
+      "auto_lock_timeout": 300000,
+      "require_password_on_wake": true,
+      "block_unknown_users": true,
+      "allow_group_invites": true,
+      "sync_contacts": false,
+      "sync_frequency": 3600000
+    },
+    
+    "notifications": {
+      "enable_sound": true,
+      "enable_desktop_notifications": true,
+      "enable_push_notifications": false,
+      "notification_filter": "contacts_only",
+      "mute_group_notifications": false,
+      "mute_during_calls": true,
+      "do_not_disturb_start": "23:00",
+      "do_not_disturb_end": "07:00",
+      "vibrate_on_notification": false,
+      "flash_window_on_notification": true,
+      "notification_badge": true
+    },
+    
+    "audio_video": {
+      "enable_voice_calls": true,
+      "enable_video_calls": true,
+      "audio_codec": "opus",
+      "video_codec": "VP8",
+      "audio_bitrate": 128000,
+      "video_bitrate": 2000000,
+      "audio_sample_rate": 48000,
+      "video_frame_rate": 30,
+      "video_resolution": "1280x720",
+      "audio_input_device": "default",
+      "audio_output_device": "default",
+      "video_input_device": "default",
+      "noise_suppression": true,
+      "echo_cancellation": true,
+      "auto_gain_control": true,
+      "enable_screen_sharing": true,
+      "enable_recording": false,
+      "recording_format": "webm",
+      "stun_servers": ["stun.l.google.com:19302", "stun1.l.google.com:19302"],
+      "turn_servers": [],
+      "turn_username": "",
+      "turn_password": "",
+      "ice_transport_policy": "all"
+    },
+    
+    "advanced": {
+      "log_level": "info",
+      "log_file": "~/.securechat/securechat.log",
+      "log_max_size": 10485760,
+      "log_max_files": 10,
+      "enable_debug_logging": false,
+      "debug_log_file": "~/.securechat/debug.log",
+      "enable_performance_monitoring": true,
+      "monitoring_interval": 60000,
+      "enable_crash_reporting": false,
+      "crash_report_url": "https://crash.example.com/report",
+      "enable_analytics": false,
+      "analytics_endpoint": "https://analytics.example.com",
+      "update_check_interval": 86400000,
+      "auto_update": true,
+      "update_channel": "stable",
+      "experimental_features": false,
+      "developer_mode": false,
+      "enable_websocket_debug": false,
+      "packet_logging": false,
+      "memory_limit": 536870912,
+      "thread_pool_size": 4,
+      "io_worker_threads": 2
+    }
+  },
+  
+  "profiles": [
+    {
+      "name": "work",
+      "server": {
+        "host": "chat.company.com",
+        "tcp_port": 8888,
+        "enable_ssl": true
+      },
+      "authentication": {
+        "username": "employee@company.com",
+        "auto_login": true
+      },
+      "user_interface": {
+        "theme": "light",
+        "compact_mode": true
+      }
+    },
+    {
+      "name": "personal",
+      "server": {
+        "host": "chat.example.com",
+        "tcp_port": 8888
+      },
+      "authentication": {
+        "username": "user@example.com"
+      },
+      "user_interface": {
+        "theme": "dark",
+        "enable_animations": true
+      }
+    }
+  ],
+  
+  "contacts": [
+    {
+      "user_id": 1001,
+      "username": "alice",
+      "nickname": "Alice",
+      "email": "alice@example.com",
+      "avatar": "alice.png",
+      "is_favorite": true,
+      "notification_sound": "alice_notification.wav",
+      "color": "#FF6B6B",
+      "notes": "Work colleague"
+    },
+    {
+      "user_id": 1002,
+      "username": "bob",
+      "nickname": "Bob",
+      "email": "bob@example.com",
+      "avatar": "bob.png",
+      "is_favorite": false,
+      "color": "#4ECDC4",
+      "notes": "University friend"
+    }
+  ],
+  
+  "groups": [
+    {
+      "group_id": 2001,
+      "name": "Work Team",
+      "description": "Daily standup and work discussions",
+      "avatar": "work_team.png",
+      "members": [1001, 1002, 1003],
+      "notification_settings": {
+        "mute": false,
+        "mention_only": true,
+        "sound": "team_notification.wav"
+      },
+      "is_pinned": true
+    },
+    {
+      "group_id": 2002,
+      "name": "Friends",
+      "description": "Social group",
+      "avatar": "friends.png",
+      "members": [1004, 1005, 1006],
+      "notification_settings": {
+        "mute": false,
+        "mention_only": false
+      },
+      "is_pinned": false
+    }
+  ],
+  
+  "keybindings": {
+    "send_message": "Enter",
+    "new_line": "Shift+Enter",
+    "search_contacts": "Ctrl+K",
+    "toggle_sidebar": "Ctrl+B",
+    "toggle_dark_mode": "Ctrl+D",
+    "screenshot": "Ctrl+Shift+S",
+    "file_upload": "Ctrl+U",
+    "voice_call": "Ctrl+Shift+V",
+    "video_call": "Ctrl+Shift+C",
+    "quit": "Ctrl+Q",
+    "settings": "Ctrl+,"
+  },
+  
+  "custom_emojis": [
+    {
+      "name": "party",
+      "path": "emojis/party.png",
+      "shortcode": ":party:",
+      "keywords": ["celebration", "fun", "party"]
+    },
+    {
+      "name": "coffee",
+      "path": "emojis/coffee.png",
+      "shortcode": ":coffee:",
+      "keywords": ["drink", "morning", "break"]
+    }
+  ],
+  
+  "server_overrides": {
+    "chat.example.com": {
+      "tcp_port": 8888,
+      "websocket_port": 8889,
+      "api_base_url": "https://chat.example.com/api/v3",
+      "enable_ssl": true,
+      "ssl_ca_file": "/etc/ssl/certs/example-ca.crt"
+    },
+    "localhost": {
+      "tcp_port": 8888,
+      "websocket_port": 8889,
+      "enable_ssl": false,
+      "ssl_verify_peer": false
+    }
+  },
+  
+  "metadata": {
+    "created_at": "2024-01-15T10:30:00Z",
+    "updated_at": "2024-01-20T14:45:00Z",
+    "created_by": "SecureChat Client v3.0.0",
+    "last_used_profile": "personal",
+    "configuration_version": 3
+  }
+}

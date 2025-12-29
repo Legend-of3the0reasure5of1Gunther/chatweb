@@ -1,0 +1,81 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'securechat'
+    environment: '${NODE_ENV}'
+
+# 告警规则
+rule_files:
+  - "alert_rules.yml"
+
+# 抓取配置
+scrape_configs:
+  # 抓取应用指标
+  - job_name: 'securechat-backend'
+    static_configs:
+      - targets: ['backend:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.*):.*'
+        replacement: '${1}'
+    
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'go_.*'
+        action: drop
+
+  # 抓取WebSocket指标
+  - job_name: 'securechat-websocket'
+    static_configs:
+      - targets: ['backend:8081']
+    metrics_path: '/ws-metrics'
+    scrape_interval: 10s
+
+  # 抓取数据库指标
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 30s
+
+  # 抓取Redis指标
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
+
+  # 抓取节点指标
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+
+  # 抓取Nginx指标
+  - job_name: 'nginx-exporter'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+    scrape_interval: 30s
+
+# 远程写入配置（可选）
+remote_write:
+  - url: "https://prometheus-remote-write.example.com/api/v1/write"
+    basic_auth:
+      username: "${PROMETHEUS_USER}"
+      password: "${PROMETHEUS_PASSWORD}"
+    queue_config:
+      max_samples_per_send: 1000
+      capacity: 5000
+      max_shards: 200
+
+# 远程读取配置（可选）
+remote_read:
+  - url: "https://prometheus-remote-read.example.com/api/v1/read"
+    basic_auth:
+      username: "${PROMETHEUS_USER}"
+      password: "${PROMETHEUS_PASSWORD}"
+    read_recent: true

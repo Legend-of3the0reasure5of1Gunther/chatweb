@@ -1,0 +1,120 @@
+groups:
+  - name: securechat_alerts
+    rules:
+      # 高错误率警报
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          service: backend
+        annotations:
+          summary: "高错误率检测到"
+          description: "错误率超过5% (当前值: {{ $value }})"
+          runbook_url: "https://docs.securechat.example.com/runbooks/high-error-rate"
+
+      # 高延迟警报
+      - alert: HighResponseLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 3m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: "高响应延迟检测到"
+          description: "95%的请求延迟超过1秒 (当前值: {{ $value }}s)"
+          runbook_url: "https://docs.securechat.example.com/runbooks/high-latency"
+
+      # 内存使用警报
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          service: node
+        annotations:
+          summary: "高内存使用率"
+          description: "内存使用率超过90% (当前值: {{ $value | humanizePercentage }})"
+          runbook_url: "https://docs.securechat.example.com/runbooks/high-memory"
+
+      # CPU使用警报
+      - alert: HighCPUUsage
+        expr: rate(node_cpu_seconds_total{mode="idle"}[5m]) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: node
+        annotations:
+          summary: "高CPU使用率"
+          description: "CPU空闲率低于10% (当前值: {{ $value | humanizePercentage }})"
+          runbook_url: "https://docs.securechat.example.com/runbooks/high-cpu"
+
+      # 磁盘空间警报
+      - alert: LowDiskSpace
+        expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} < 0.1
+        for: 5m
+        labels:
+          severity: critical
+          service: node
+        annotations:
+          summary: "磁盘空间不足"
+          description: "根分区可用空间低于10% (当前值: {{ $value | humanizePercentage }})"
+          runbook_url: "https://docs.securechat.example.com/runbooks/low-disk-space"
+
+      # 数据库连接池警报
+      - alert: DatabaseConnectionPoolExhausted
+        expr: pg_stat_database_numbackends / pg_stat_database_setting_max_connections > 0.8
+        for: 2m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "数据库连接池即将耗尽"
+          description: "数据库连接使用率超过80% (当前值: {{ $value | humanizePercentage }})"
+          runbook_url: "https://docs.securechat.example.com/runbooks/database-connections"
+
+      # Redis内存警报
+      - alert: RedisMemoryUsageHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.8
+        for: 2m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis内存使用率高"
+          description: "Redis内存使用率超过80% (当前值: {{ $value | humanizePercentage }})"
+          runbook_url: "https://docs.securechat.example.com/runbooks/redis-memory"
+
+      # WebSocket连接警报
+      - alert: WebSocketConnectionsHigh
+        expr: websocket_connections_total > 800
+        for: 2m
+        labels:
+          severity: warning
+          service: websocket
+        annotations:
+          summary: "WebSocket连接数高"
+          description: "WebSocket连接数超过800 (当前值: {{ $value }})"
+          runbook_url: "https://docs.securechat.example.com/runbooks/websocket-connections"
+
+      # 服务下线警报
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "服务 {{ $labels.instance }} 下线"
+          description: "服务 {{ $labels.instance }} 已经下线超过1分钟"
+          runbook_url: "https://docs.securechat.example.com/runbooks/service-down"
+
+      # 证书过期警报
+      - alert: SSLCertificateExpiringSoon
+        expr: ssl_certificate_expiry_seconds < 86400 * 30  # 30天
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSL证书即将过期"
+          description: "SSL证书将在 {{ $value | humanizeDuration }} 后过期"
+          runbook_url: "https://docs.securechat.example.com/runbooks/ssl-certificate"

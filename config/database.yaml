@@ -1,0 +1,61 @@
+# 数据库配置
+database:
+  # 主数据库
+  main:
+    driver: "postgresql"
+    host: ${DB_HOST:-localhost}
+    port: ${DB_PORT:-5432}
+    database: ${DB_NAME:-securechat}
+    username: ${DB_USER:-securechat_user}
+    password: ${DB_PASSWORD}
+    charset: "utf8mb4"
+    collation: "utf8mb4_unicode_ci"
+    
+    # 连接池配置
+    pool:
+      min: ${DB_POOL_MIN:-2}
+      max: ${DB_POOL_MAX:-20}
+      acquire: 30000
+      idle: 10000
+      evict: 1000
+    
+    # SSL配置
+    ssl:
+      enabled: ${DB_SSL_ENABLED:-true}
+      mode: "verify-full"
+      ca: "/app/ssl/db-ca.pem"
+      cert: "/app/ssl/db-cert.pem"
+      key: "/app/ssl/db-key.pem"
+    
+    # 连接重试
+    retry:
+      attempts: 3
+      delay: 1000
+    
+    # 慢查询日志
+    slow_query_threshold: 1000  # 毫秒
+    log_queries: false
+  
+  # 只读副本 (可选)
+  replica:
+    enabled: false
+    driver: "postgresql"
+    host: "replica-db-host"
+    port: 5432
+    database: "securechat"
+    username: "readonly_user"
+    password: "${READONLY_DB_PASSWORD}"
+    pool:
+      min: 2
+      max: 10
+  
+  # 迁移配置
+  migrations:
+    table: "migrations"
+    directory: "/app/database/migrations"
+    extension: "sql"
+  
+  # 种子数据
+  seeds:
+    directory: "/app/database/seeds"
+    run_on_startup: false
